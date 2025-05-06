@@ -1,7 +1,6 @@
 from discord.ext import commands
 import discord
 import asyncio
-from lib.lang_detect import detect_language_for_gTTS
 from lib.myTTS import get_audio, play_audio_sync, combine_audios
 
 # 調用event函式庫
