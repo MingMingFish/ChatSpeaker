@@ -4,6 +4,10 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from lib.myCommands import setup_commands
 from lib.voice_bot import VoiceBot
+import logging
+
+# 降低語音播報player的日誌提示級別，僅顯示錯誤和警告
+logging.getLogger("discord.player").setLevel(logging.WARNING)
 
 # 載入環境變數
 load_dotenv()
