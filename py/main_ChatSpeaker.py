@@ -25,7 +25,7 @@ setup_commands(bot, voice_bot)  # 傳入 myCommands.py
 # 調用event函式庫
 @bot.event
 async def on_ready():
-    print(f"Bot has been begone，ID：{bot.user}")
+    print(f"Bot Start Successfully, ID：{bot.user}")
 
 if __name__ == "__main__":
     bot.run(TOKEN)
