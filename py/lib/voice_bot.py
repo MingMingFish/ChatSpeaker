@@ -11,15 +11,18 @@ class VoiceBot:
 
     async def join(self, ctx):
         """讓機器人加入使用者所在的語音頻道"""
-        if ctx.author.voice:
-            channel = ctx.author.voice.channel
-            if ctx.voice_client is None:
-                self.voice_client = await channel.connect()
-                return "已加入語音頻道。"
-            else:
-                return "已經在語音頻道中。"
-        else:
+        if ctx.author.voice is None: # 如果使用者不在語音頻道中
             return "請先加入語音頻道。"
+        user_voice_channel = ctx.author.voice.channel
+        if ctx.voice_client != user_voice_channel: # 如果機器人與使用者的頻道不同
+            if ctx.voice_client: # 如果機器人已經在語音頻道中
+                await self.voice_client.move_to(user_voice_channel) # 移動到使用者的語音頻道
+            else: # 如果機器人不在語音頻道中
+                self.voice_client = await user_voice_channel.connect() # 連接到使用者的語音頻道
+            return f"已加入語音頻道：{self.voice_client.channel.name}"
+        else:
+            return "已經在語音頻道中。"
+
 
     async def leave(self, ctx):
         """讓機器人離開語音頻道"""
@@ -33,12 +36,15 @@ class VoiceBot:
 
     async def say_yt_chat(self, ctx, url):
         """朗讀YouTube聊天室內容"""
-        if ctx.voice_client is None:
-            if ctx.author.voice:
-                voice_channel = ctx.author.voice.channel
-                self.voice_client = await voice_channel.connect()
-            else:
-                return "請先加入語音頻道。"
+        if ctx.author.voice is None: # 如果使用者不在語音頻道中
+            return "請先加入語音頻道。"
+        user_voice_channel = ctx.author.voice.channel
+        if ctx.voice_client != user_voice_channel: # 如果機器人與使用者的頻道不同
+            if ctx.voice_client: # 如果機器人已經在語音頻道中
+                await self.voice_client.move_to(user_voice_channel) # 移動到使用者的語音頻道
+            else: # 如果機器人不在語音頻道中
+                self.voice_client = await user_voice_channel.connect() # 連接到使用者的語音頻道
+            await ctx.send(f"已加入語音頻道：{self.voice_client.name}", delete_after = 3)
 
         video_id = await yt_url.get_vid(url)
         if video_id is None:
@@ -60,19 +66,21 @@ class VoiceBot:
 
     async def say(self, ctx, *, text):
         """朗讀指定的文字"""
-        if ctx.author.voice is None:
+        if ctx.author.voice is None: # 如果使用者不在語音頻道中
             return "請先加入語音頻道。"
-
-        voice_channel = ctx.author.voice.channel
-        if ctx.voice_client is None:
-            bot_voice_channel = await voice_channel.connect()
-            print(f"Joined voice channel: {voice_channel.name}")
-        else:
-            bot_voice_channel = ctx.voice_client
+        user_voice_channel = ctx.author.voice.channel
+        if ctx.voice_client != user_voice_channel: # 如果機器人與使用者的頻道不同
+            if ctx.voice_client: # 如果機器人已經在語音頻道中
+                await self.voice_client.move_to(user_voice_channel) # 移動到使用者的語音頻道
+                # await asyncio.sleep(1)
+            else: # 如果機器人不在語音頻道中
+                self.voice_client = await user_voice_channel.connect() # 連接到使用者的語音頻道
+            await ctx.send(f"已加入語音頻道：{self.voice_client.channel.name}", delete_after = 3)
 
         language = lang_detect.detect_language_for_gTTS(text)
         audio = myTTS.get_audio(text, language)
-        await bot_audio.play_audio_sync(bot_voice_channel, audio)
+        await bot_audio.play_audio_sync(self.voice_client, audio)
+
         return None
     async def readout(self, ctx):
         """啟用朗讀模式"""
