@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 from lib.voice_bot import VoiceBot
 from lib.myCommands import setup_commands
-from lib.event import setup_events
+from lib.events import setup_events
 
 # 降低語音播報player的日誌提示級別，僅顯示錯誤和警告
 logging.getLogger("discord.player").setLevel(logging.WARNING)
