@@ -1,8 +1,7 @@
 from discord.ext import commands
 import discord
 from lib.lang_detect import detect_language_for_gTTS
-from lib.bot_audio import play_audio
-from lib.myTTS import get_audio
+from lib.myTTS import get_audio, play_audio, combine_audios
 
 # 調用event函式庫
 def setup_events(bot: commands.Bot, voice_bot):
@@ -30,28 +29,19 @@ def setup_events(bot: commands.Bot, voice_bot):
                 message.guild.voice_client.is_connected()):
             # if 內容：
                 voice_client = message.guild.voice_client
-                # 朗讀發言者名稱
-                if message.author.display_name:
-                    username = message.author.display_name
-                else:
-                    username = message.author.name
-                language = detect_language_for_gTTS(username)
-                audio = get_audio(username, language)
-                await play_audio(voice_client, audio)
-                # 朗讀「在」字
-                audio = get_audio("在", language="zh-TW")
-                await play_audio(voice_client, audio)
-                # 朗讀頻道名稱
-                language = detect_language_for_gTTS(message.channel.name)
-                audio = get_audio(message.channel.name, language)
-                await play_audio(voice_client, audio)
-                # 朗讀「說」字
-                audio = get_audio("說", language="zh-TW")
-                await play_audio(voice_client, audio)
-                # 朗讀訊息內容
-                language = detect_language_for_gTTS(message.content)
-                audio = get_audio(message.content, language)
-                await play_audio(voice_client, audio)
+                # 發言者名稱
+                nick = message.author.display_name
+                name = message.author.name
+                username = nick if nick else name
+                audios = [
+                    await get_audio(username),               # 用戶名稱
+                    await get_audio("在", language="zh-TW"), # 「在」字
+                    await get_audio(message.channel.name),   # 頻道名稱
+                    await get_audio("說", language="zh-TW"), # 「說」字
+                    await get_audio(message.content)         # 訊息內容
+                ]
+                combine_audios(*audios)  # 合併音訊
+                await play_audio(voice_client, audios)
             # end if
         await bot.process_commands(message)  # 處理其他指令
 
@@ -84,11 +74,12 @@ def setup_events(bot: commands.Bot, voice_bot):
                 should_return_to_original = True
 
             # 播報使用者名稱
+            audios = []
             username = member.display_name
-            language = detect_language_for_gTTS(username)
-            audio = get_audio(username, language)
-            await play_audio(bot_voice_client, audio)
-            audio = get_audio('加入聊天', 'zh-TW')
+            language = await detect_language_for_gTTS(username)
+            audios.append(await get_audio(username, language))
+            audios.append(await get_audio('加入聊天', 'zh-TW'))
+            audio = await combine_audios(*audios)
             await play_audio(bot_voice_client, audio)
 
             # 播報後處理離開或返回語音頻道
