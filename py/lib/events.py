@@ -30,16 +30,12 @@ def setup_events(bot: commands.Bot, voice_bot):
                 message.guild.voice_client.is_connected()):
             # if 內容：
                 voice_client = message.guild.voice_client
-                # 發言者名稱
-                nick = message.author.display_name
-                name = message.author.name
-                username = nick if nick else name
                 audios = [
-                    await get_audio(username),               # 用戶名稱
-                    await get_audio("在", language="zh-TW"), # 「在」字
-                    await get_audio(message.channel.name),   # 頻道名稱
-                    await get_audio("說", language="zh-TW"), # 「說」字
-                    await get_audio(message.content)         # 訊息內容
+                    await get_audio(message.author.display_name), # 發言者名稱
+                    await get_audio("在", language="zh-TW"),      # 「在」字
+                    await get_audio(message.channel.name),        # 頻道名稱
+                    await get_audio("說", language="zh-TW"),      # 「說」字
+                    await get_audio(message.content)              # 訊息內容
                 ]
                 audio = await combine_audios(*audios)  # 合併音訊
                 await play_audio_sync(voice_client, audio)
