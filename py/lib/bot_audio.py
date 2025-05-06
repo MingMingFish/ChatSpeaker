@@ -4,9 +4,9 @@ import os
 
 async def play_audio(channel, audio):
     ffmpeg_path = os.path.join("tools", "ffmpeg.exe")
-    channel.play(discord.FFmpegPCMAudio(source=audio, executable=ffmpeg_path, pipe=True))
     while channel.is_playing():
         await asyncio.sleep(1)
+    channel.play(discord.FFmpegPCMAudio(source=audio, executable=ffmpeg_path, pipe=True))
 async def play_audio_sync(voice_channel, audio):
     try:
         loop = asyncio.get_running_loop()
