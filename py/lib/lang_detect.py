@@ -23,25 +23,9 @@ identifier = LanguageIdentifier.from_modelstring(model, norm_probs=True)
 # 全面開放 langid 支援語言
 langid.set_languages(None)
 
-def detect_language_for_gTTS(text):
+async def detect_language_for_gTTS(text):
     lang, prob = identifier.classify(text)
     lang = langid_to_gtts_map.get(lang, lang)
     if lang in supported_gtts_langs:
         return lang
     return 'en' # 如果不支援，預設為英文
-
-if __name__ == "__main__":
-    # 測試範例
-    samples = [
-        "Hello world.",
-        "來測試看看這串句子吧！",
-        "Let's start! 來測試看看這串句子吧！",
-        "Bonjour tout le monde.",
-        "こんにちは世界"
-    ]
-
-    for s in samples:
-        print(f"\nInput: {s}")
-        print(f"Detected (langid): {langid.classify(s)}")
-        print(f"Detected (normalized): {identifier.classify(s)}")
-        print(f"Mapped to gTTS: {detect_language_for_gTTS(s)}")

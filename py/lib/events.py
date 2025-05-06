@@ -1,7 +1,8 @@
 from discord.ext import commands
 import discord
+import asyncio
 from lib.lang_detect import detect_language_for_gTTS
-from lib.myTTS import get_audio, play_audio, combine_audios
+from lib.myTTS import get_audio, play_audio_sync, combine_audios
 
 # 調用event函式庫
 def setup_events(bot: commands.Bot, voice_bot):
@@ -40,8 +41,8 @@ def setup_events(bot: commands.Bot, voice_bot):
                     await get_audio("說", language="zh-TW"), # 「說」字
                     await get_audio(message.content)         # 訊息內容
                 ]
-                combine_audios(*audios)  # 合併音訊
-                await play_audio(voice_client, audios)
+                audio = await combine_audios(*audios)  # 合併音訊
+                await play_audio_sync(voice_client, audio)
             # end if
         await bot.process_commands(message)  # 處理其他指令
 
@@ -74,15 +75,20 @@ def setup_events(bot: commands.Bot, voice_bot):
                 should_return_to_original = True
 
             # 播報使用者名稱
-            audios = []
             username = member.display_name
-            language = await detect_language_for_gTTS(username)
-            audios.append(await get_audio(username, language))
-            audios.append(await get_audio('加入聊天', 'zh-TW'))
+            audios = [
+                await get_audio(username),
+                await get_audio('加入聊天', 'zh-TW')
+                ]
             audio = await combine_audios(*audios)
-            await play_audio(bot_voice_client, audio)
 
-            # 播報後處理離開或返回語音頻道
+            while voice_bot.voice_client is None or not voice_bot.voice_client.is_connected():
+                await asyncio.sleep(0.1)
+            await play_audio_sync(bot_voice_client, audio)
+
+            while bot_voice_client.is_playing():
+                await asyncio.sleep(1)
+            # 播報後離開或返回語音頻道
             if should_return_to_original and original_channel:
                 await bot_voice_client.move_to(original_channel)
             elif should_disconnect_after:

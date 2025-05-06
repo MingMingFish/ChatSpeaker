@@ -1,7 +1,6 @@
-
 import asyncio
 import pytchat
-from lib import bot_audio, myTTS
+from lib import myTTS
 
 class ChatListener:
     def __init__(self, video_id, voice_bot, bot_voice_channel):
@@ -35,16 +34,18 @@ class ChatListener:
 
     async def play_message(self, message):
         """處理訊息並進行語音播放"""
-        # 假設 myTTS 和 bot_audio 是已經定義好的語音處理工具
-        lang1 = myTTS.detect_language_for_gTTS(message.author.name)
-        audio1 = myTTS.get_audio(message.author.name, lang1)
-        await bot_audio.play_audio(self.bot_voice_channel, audio1)
-
-        # 播放語音 "說"
-        audio2 = myTTS.get_audio("說", language='zh-TW')
-        await bot_audio.play_audio(self.bot_voice_channel, audio2)
-
-        # 播放訊息內容語音
-        lang3 = myTTS.detect_language_for_gTTS(message.message)
-        audio3 = myTTS.get_audio(message.message, lang3)
-        await bot_audio.play_audio(self.bot_voice_channel, audio3)
+        audios = []
+        # 語言偵測
+        lang1 = await myTTS.detect_language_for_gTTS(message.author.name)
+        lang3 = await myTTS.detect_language_for_gTTS(message.message)
+        # 語音生成
+        audio1 = await myTTS.get_audio(message.author.name, lang1)# 名字
+        audio2 = await myTTS.get_audio("說", language='zh-TW') # "說"字
+        audio3 = await myTTS.get_audio(message.message, lang3) # 訊息
+        # 語音合成
+        audios.append(audio1)
+        audios.append(audio2)
+        audios.append(audio3)
+        audio = await myTTS.combine_audios(*audios)
+        # 播放語音
+        await myTTS.play_audio_sync(self.bot_voice_channel, audio)

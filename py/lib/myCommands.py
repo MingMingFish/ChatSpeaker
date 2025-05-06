@@ -1,6 +1,3 @@
-from lib.myTTS import detect_language_for_gTTS, get_audio
-from lib.bot_audio import play_audio
-
 def setup_commands(bot, voice_bot):
 
     @bot.command()
@@ -27,7 +24,7 @@ def setup_commands(bot, voice_bot):
 
     @bot.command()
     async def stop_yt_chat(ctx):
-        msg = await voice_bot.stop_yt_chat()
+        msg = await voice_bot.stop_yt_chat(ctx)
         if msg:
             await ctx.send(msg, delete_after = 3)
         await ctx.message.delete()
@@ -44,15 +41,17 @@ def setup_commands(bot, voice_bot):
     async def readout(ctx):
         voice_bot.read_mode = True
         msg = await voice_bot.readout(ctx)
-        await ctx.send(msg, delete_after = 3)
+        if msg:
+            await ctx.send(msg, delete_after = 3)
         await ctx.message.delete()
 
 
     @bot.command()
     async def noreadout(ctx):
         voice_bot.read_mode = False
-        msg = voice_bot.noreadout()
-        await ctx.send(msg, delete_after = 3)
+        msg = await voice_bot.noreadout(ctx)
+        if msg:
+            await ctx.send(msg, delete_after = 3)
         await ctx.message.delete()
     
     @bot.command()

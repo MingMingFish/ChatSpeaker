@@ -1,8 +1,6 @@
 import asyncio
 from lib import chat_listener
-from lib import yt_url, lang_detect, bot_audio, myTTS
-
-BOT_ALREADY_EXISTS_STR = "已經在語音頻道中。"
+from lib import yt_url, lang_detect, myTTS
 
 class VoiceBot:
     def __init__(self, bot):
@@ -20,7 +18,7 @@ class VoiceBot:
             if(self.voice_client != user_voice_channel): # 如果在不同語音頻道
                 await self.voice_client.move_to(user_voice_channel) # 移動到使用者的語音頻道
             else: # 如果機器人已經在使用者的語音頻道中
-                return BOT_ALREADY_EXISTS_STR
+                return "已經在語音頻道中。"
         else: # 如果機器人不在語音頻道中，則連接到使用者的語音頻道
             self.voice_client = await user_voice_channel.connect()
         return f"已加入語音頻道：{self.voice_client.channel.name}"
@@ -37,11 +35,8 @@ class VoiceBot:
 
     async def say_yt_chat(self, ctx, url):
         """朗讀YouTube聊天室內容"""
-        msg = await self.join(ctx) # 先加入語音頻道
-        if msg != BOT_ALREADY_EXISTS_STR:
-            return msg
-        else:
-            await ctx.send(msg, delete_after = 3)
+        msg = await self.join(ctx)  # 確保已加入語音頻道
+        await ctx.send(msg, delete_after=3)
 
         video_id = await yt_url.get_vid(url)
         if video_id is None:
@@ -56,41 +51,28 @@ class VoiceBot:
         asyncio.create_task(self.chat_reader.start())  # 使用 asyncio.create_task 來非阻塞地啟動
         return "開始朗讀聊天室。"
 
-    async def stop_yt_chat(self):
+    async def stop_yt_chat(self, ctx):
         """停止朗讀YouTube聊天室內容"""
         self.chat_reader.stop()  # 停止聊天室讀取
         return "已停止朗讀聊天室。"
 
     async def say(self, ctx, *, text):
         """朗讀指定的文字"""
-        msg = await self.join(ctx) # 先加入語音頻道
-        if msg != BOT_ALREADY_EXISTS_STR:
-            return msg
-        else:
-            await ctx.send(msg, delete_after = 3)
+        msg = await self.join(ctx)  # 確保已加入語音頻道
+        await ctx.send(msg, delete_after=3)
 
         language = await lang_detect.detect_language_for_gTTS(text)
         audio = await myTTS.get_audio(text, language)
-        await bot_audio.play_audio_sync(self.voice_client, audio)
+        await myTTS.play_audio_sync(self.voice_client, audio)
         return None
     async def readout(self, ctx):
         """啟用朗讀模式"""
-        msg = await self.join(ctx) # 先加入語音頻道
-        if msg != BOT_ALREADY_EXISTS_STR:
-            return msg
-        else:
-            await ctx.send(msg, delete_after = 3)
+        msg = await self.join(ctx)  # 確保已加入語音頻道
+        await ctx.send(msg, delete_after=3)
+        self.read_mode = True
+        return "🔊 朗讀模式已啟用"
 
-        if ctx.author.voice:
-            channel = ctx.author.voice.channel
-            if ctx.voice_client is None:
-                self.voice_client = await channel.connect()
-                self.read_mode = True
-                return "🔊 朗讀模式已啟用"
-        else:
-            return "請先加入語音頻道。"
-
-    async def noreadout(self):
+    async def noreadout(self, ctx):
         """停用朗讀模式"""
         self.read_mode = False
         return "🔇 朗讀模式已停用"
