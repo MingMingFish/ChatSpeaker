@@ -5,13 +5,7 @@ from gtts import gTTS # pip install gTTS
 from io import BytesIO
 # pip install langid
 from lib.lang_detect import detect_language_for_gTTS  # 引入語言偵測函式庫
-from pydub import AudioSegment
-# from pydub.utils import which
-from pydub import AudioSegment
-
-# ffmpeg_path = "E:/Files/Coding_Program/Python/DC_bot/ChatSpeaker/py/tools/ffmpeg.exe"
-# AudioSegment.ffmpeg = ffmpeg_path  # 設定 ffmpeg 的路徑
-# AudioSegment.converter = which(ffmpeg_path)  # 替換成你的路徑
+from pydub import AudioSegment # Please add "/ffmpeg/bin" to system environment variable manually
 
 async def get_audio(text, language=None):
     # 使用 gTTS 和自動偵測語言
