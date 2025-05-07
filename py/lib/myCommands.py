@@ -72,5 +72,3 @@ def setup_commands(bot, voice_bot):
             await ctx.send(message)
         else:
             await ctx.send("Error: 沒有可用的指令。")
-
-    
