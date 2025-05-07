@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import logging
 import discord
 from discord.ext import commands
-from lib.voice_bot import VoiceBot
+from lib.voiceBot import VoiceBot
 from lib.myCommands import setup_commands
 from lib.events import setup_events
 
