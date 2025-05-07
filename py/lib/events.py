@@ -48,17 +48,18 @@ def setup_events(bot: commands.Bot, voice_bot):
             return
 
         # 偵測加入語音頻道
-        if before.channel != after.channel:
+        if before.channel != after.channel and after.channel is not None:
             guild = member.guild # 獲取伺服器對象
             target_channel = after.channel # 獲取使用者的語音頻道
-
             # 取得 bot 的 voice client
             bot_voice_client = discord.utils.get(bot.voice_clients, guild=guild)
             original_channel = bot_voice_client.channel if bot_voice_client else None
-
             # 決定是否要移動/加入語音頻道
             should_disconnect_after = False
             should_return_to_original = False
+
+            while bot_voice_client is not None and bot_voice_client.is_playing():
+                await asyncio.sleep(0.1)
 
             if bot_voice_client is None:
                 # bot 沒有連線，加入使用者的語音頻道
@@ -76,9 +77,9 @@ def setup_events(bot: commands.Bot, voice_bot):
                 await get_audio('加入聊天', 'zh-TW')
                 ]
             audio = await combine_audios(*audios)
-
-            while voice_bot.voice_client is None or not voice_bot.voice_client.is_connected():
-                await asyncio.sleep(0.1)
+            # 播放音訊
+            while bot_voice_client is None or not bot_voice_client.is_connected():
+                await asyncio.sleep(0.5)
             await play_audio_sync(bot_voice_client, audio)
 
             while bot_voice_client.is_playing():
