@@ -1,4 +1,8 @@
 def setup_commands(bot, voice_bot):
+    from dotenv import load_dotenv
+    from os import getenv
+    load_dotenv()
+    ADMIN_ID = getenv("ADMIN_ID")
 
     @bot.command()
     async def join(ctx):
@@ -56,7 +60,7 @@ def setup_commands(bot, voice_bot):
     
     @bot.command()
     async def shutdown(ctx):
-        if ctx.author.id != 325213129405628417:
+        if ctx.author.id != ADMIN_ID:
             await ctx.send("你沒有權限關閉機器人。", delete_after = 3)
         await ctx.message.delete()
         await ctx.send("機器人正在關機...", delete_after = 3)
