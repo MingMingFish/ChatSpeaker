@@ -48,10 +48,15 @@ def setup_events(bot: commands.Bot, voice_bot):
             return
 
         # 偵測加入語音頻道
-        if before.channel != after.channel and after.channel is not None:
+        if before.channel != after.channel:
             guild = member.guild # 獲取伺服器對象
-            target_channel = after.channel # 獲取使用者的語音頻道
-            # 取得 bot 的 voice client
+            if after.channel is not None:
+                target_channel = after.channel # 獲取使用者的語音頻道
+                activity_message = '加入聊天'
+            else:
+                target_channel = before.channel # 獲取使用者的語音頻道
+                activity_message = '離開聊天'
+                # 取得 bot 的 voice client
             bot_voice_client = discord.utils.get(bot.voice_clients, guild=guild)
             original_channel = bot_voice_client.channel if bot_voice_client else None
             # 決定是否要移動/加入語音頻道
@@ -74,7 +79,7 @@ def setup_events(bot: commands.Bot, voice_bot):
             username = member.display_name
             audios = [
                 await get_audio(username),
-                await get_audio('加入聊天', 'zh-TW')
+                await get_audio(activity_message, 'zh-TW')
                 ]
             audio = await combine_audios(*audios)
             # 播放音訊
