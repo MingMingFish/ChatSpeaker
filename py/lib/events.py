@@ -9,7 +9,6 @@ def setup_events(bot: commands.Bot, voice_bot):
     @bot.event
     async def on_ready():
         print(f"Bot Start Successfully, ID：{bot.user}")
-        # print(f"機器人已上線：{bot.user.name}#{bot.user.discriminator}")
 
     @bot.event
     async def on_member_join(member: discord.Member):
