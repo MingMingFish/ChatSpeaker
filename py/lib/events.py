@@ -56,7 +56,7 @@ def setup_events(bot: commands.Bot, voice_bot):
             else:
                 target_channel = before.channel # 獲取使用者的語音頻道
                 activity_message = '離開聊天'
-                # 取得 bot 的 voice client
+            # 取得 bot 的 voice client
             bot_voice_client = discord.utils.get(bot.voice_clients, guild=guild)
             original_channel = bot_voice_client.channel if bot_voice_client else None
             # 決定是否要移動/加入語音頻道
