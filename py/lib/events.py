@@ -11,11 +11,12 @@ def setup_events(bot: commands.Bot, voice_bot):
         print(f"Bot Start Successfully, ID：{bot.user}")
         # print(f"機器人已上線：{bot.user.name}#{bot.user.discriminator}")
 
-    # @bot.event
-    # async def on_member_join(member: discord.Member):
-    #     channel = discord.utils.get(member.guild.text_channels, name="general")
-    #     if channel:
-    #         await channel.send(f"歡迎 {member.mention} 加入伺服器！")
+    @bot.event
+    async def on_member_join(member: discord.Member):
+        channel = discord.utils.get(member.guild.text_channels, name="大門")
+        if channel:
+            await channel.send(f"{member.mention} 歡迎光臨盈月酒館！")
+
     @bot.event
     async def on_message(message):
         if message.author.bot:
