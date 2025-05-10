@@ -7,7 +7,7 @@
     - Join the voice channel (to the vc where the user who sent cmd)
 - `>leave`
     - Leave the voice channel
-- `>say_yt_chat <YouTube直播網址>`
+- `>say_yt_chat <YouTube URL>`
     - Read out YouTube live chat
 - `>stop_yt_chat`
     - Stop reading YouTube live chat
