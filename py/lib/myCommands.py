@@ -2,64 +2,64 @@ def setup_commands(bot, voice_bot):
     from dotenv import load_dotenv
     from os import getenv
     from discord.ext import commands
+    from guild_config import set_prefix  # 提前 import
     load_dotenv()
-    ADMIN_ID = getenv("ADMIN_ID")
+    ADMIN_ID = int(getenv("ADMIN_ID"))
 
-    @bot.command()
-    async def join(ctx):
+    @bot.command(name="join")
+    async def _join(ctx):
         msg = await voice_bot.join(ctx)
         if msg:
-            await ctx.send(msg, delete_after = 3)
+            await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
 
-    @bot.command()
-    async def leave(ctx):
-        bot.read_mode = False  # 停用朗讀模式
+    @bot.command(name="leave")
+    async def _leave(ctx):
+        bot.read_mode = False
         msg = await voice_bot.leave(ctx)
         if msg:
-            await ctx.send(msg, delete_after = 3)
+            await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
 
-    @bot.command()
-    async def say_yt_chat(ctx, url):
+    @bot.command(name="say_yt_chat")
+    async def _say_yt_chat(ctx, url):
         msg = await voice_bot.say_yt_chat(ctx, url)
         if msg:
-            await ctx.send(msg, delete_after = 3)
+            await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
 
-    @bot.command()
-    async def stop_yt_chat(ctx):
+    @bot.command(name="stop_yt_chat")
+    async def _stop_yt_chat(ctx):
         msg = await voice_bot.stop_yt_chat(ctx)
         if msg:
-            await ctx.send(msg, delete_after = 3)
+            await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
 
-    @bot.command()
-    async def say(ctx, *, text):
+    @bot.command(name="say")
+    async def _say(ctx, *, text):
         msg = await voice_bot.say(ctx, text=text)
         if msg:
-            await ctx.send(msg, delete_after = 3)
+            await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
-        
 
-    @bot.command()
-    async def readout(ctx):
+    @bot.command(name="readout")
+    async def _readout(ctx):
         voice_bot.read_mode = True
         msg = await voice_bot.readout(ctx)
         if msg:
-            await ctx.send(msg, delete_after = 3)
+            await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
 
-    @bot.command()
-    async def noreadout(ctx):
+    @bot.command(name="noreadout")
+    async def _noreadout(ctx):
         voice_bot.read_mode = False
         msg = await voice_bot.noreadout(ctx)
         if msg:
-            await ctx.send(msg, delete_after = 3)
+            await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
-    
-    @bot.command()
-    async def helps(ctx):
+
+    @bot.command(name="helps")
+    async def _helps(ctx):
         msg = await voice_bot.helps(ctx)
         message = ""
         if msg:
@@ -71,15 +71,15 @@ def setup_commands(bot, voice_bot):
 
     @bot.command(name="setprefix")
     @commands.has_permissions(administrator=True)
-    async def set_prefix_cmd(ctx, new_prefix):
-        from guild_config import set_prefix
+    async def _setprefix(ctx, new_prefix):
         set_prefix(bot, ctx.guild.id, new_prefix)
         await ctx.send(f"已將前綴設為 `{new_prefix}`")
 
-    @bot.command()
-    async def shutdown(ctx):
+    @bot.command(name="shutdown")
+    async def _shutdown(ctx):
         if ctx.author.id != ADMIN_ID:
-            await ctx.send("你沒有權限關閉機器人。", delete_after = 3)
+            await ctx.send("你沒有權限關閉機器人。", delete_after=3)
+            return
         await ctx.message.delete()
-        await ctx.send("機器人正在關機...", delete_after = 3)
+        await ctx.send("機器人正在關機...", delete_after=3)
         await voice_bot.shutdown(ctx)
