@@ -2,7 +2,7 @@ def setup_commands(bot, voice_bot):
     from dotenv import load_dotenv
     from os import getenv
     from discord.ext import commands
-    from guild_config import set_prefix  # 提前 import
+    from lib.guild_config import set_prefix
     load_dotenv()
     ADMIN_ID = int(getenv("ADMIN_ID"))
 
@@ -43,17 +43,17 @@ def setup_commands(bot, voice_bot):
         await ctx.message.delete()
 
     @bot.command(name="readout")
-    async def _readout(ctx):
+    async def _read_out(ctx):
         voice_bot.read_mode = True
-        msg = await voice_bot.readout(ctx)
+        msg = await voice_bot.read_out(ctx)
         if msg:
             await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
 
     @bot.command(name="noreadout")
-    async def _noreadout(ctx):
+    async def _no_read_out(ctx):
         voice_bot.read_mode = False
-        msg = await voice_bot.noreadout(ctx)
+        msg = await voice_bot.no_read_out(ctx)
         if msg:
             await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
@@ -69,11 +69,11 @@ def setup_commands(bot, voice_bot):
         else:
             await ctx.send("Error: 沒有可用的指令。")
 
-    @bot.command(name="setprefix")
+    @bot.command(name="set_prefix")
     @commands.has_permissions(administrator=True)
-    async def _setprefix(ctx, new_prefix):
-        set_prefix(bot, ctx.guild.id, new_prefix)
-        await ctx.send(f"已將前綴設為 `{new_prefix}`")
+    async def _set_prefix(ctx, new_prefix):
+        set_prefix(voice_bot, ctx.guild.id, new_prefix)
+        await ctx.send(f"已將指令前綴設為 `{new_prefix}`")
 
     @bot.command(name="shutdown")
     async def _shutdown(ctx):
