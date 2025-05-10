@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import asyncio
 from lib.myTTS import get_audio, play_audio_sync, combine_audios
+from lib.guild_config import get_prefix
 
 # 調用event函式庫
 def setup_events(bot: commands.Bot, voice_bot):
@@ -20,7 +21,7 @@ def setup_events(bot: commands.Bot, voice_bot):
     async def on_message(message):
         if message.author.bot:
             return
-        if not message.content.startswith(bot.command_prefix):
+        if not message.content.startswith(get_prefix(bot, message)):
             if (
             # if 條件：
                 voice_bot.read_mode and

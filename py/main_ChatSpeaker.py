@@ -16,12 +16,12 @@ load_dotenv()
 TOKEN = os.getenv("DC_BOT_TOKEN")
 prefix = ">"  # 指令前綴符號
 # Bot基礎設定
-config = load_config()  # 注意：這要在 bot 初始化之前做
 intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
+config = load_config()  # 注意：這要在 bot 初始化之前做
 # 建立語音Bot實例
-bot = commands.Bot(command_prefix=get_prefix, intents=intents)
+bot = commands.Bot(command_prefix=lambda bot, msg: get_prefix(bot, msg), intents=intents)
 bot.guild_config = config  # 初始化後掛載設定資料
 voice_bot = VoiceBot(bot)
 setup_commands(bot, voice_bot)  # 設定commands  : myCommands.py

@@ -8,6 +8,8 @@ class VoiceBot:
         self.voice_client = None  # discord.VoiceClient 實例
         self.read_mode = False
         self.chat_reader = None  # 用於存儲 ChatListener 實例
+        # 用來載入伺服器設定 bot.guild_config 若 bot 無此屬性則使用空字典 
+        self.guild_config = getattr(bot, "guild_config", {})
 
     async def join(self, ctx):
         """讓機器人加入使用者所在的語音頻道"""
@@ -65,14 +67,14 @@ class VoiceBot:
         audio = await myTTS.get_audio(text, language)
         await myTTS.play_audio_sync(self.voice_client, audio)
         return None
-    async def readout(self, ctx):
+    async def read_out(self, ctx):
         """啟用朗讀模式"""
         msg = await self.join(ctx)  # 確保已加入語音頻道
         await ctx.send(msg, delete_after=3)
         self.read_mode = True
         return "🔊 朗讀模式已啟用"
 
-    async def noreadout(self, ctx):
+    async def no_read_out(self, ctx):
         """停用朗讀模式"""
         self.read_mode = False
         return "🔇 朗讀模式已停用"

@@ -72,7 +72,7 @@ def setup_commands(bot, voice_bot):
     @bot.command(name="set_prefix")
     @commands.has_permissions(administrator=True)
     async def _set_prefix(ctx, new_prefix):
-        set_prefix(voice_bot, ctx.guild.id, new_prefix)
+        await set_prefix(voice_bot, ctx.guild.id, new_prefix)
         await ctx.send(f"已將指令前綴設為 `{new_prefix}`")
 
     @bot.command(name="shutdown")

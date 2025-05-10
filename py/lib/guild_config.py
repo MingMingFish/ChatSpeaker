@@ -1,28 +1,28 @@
 import json
 import os
 
-CONFIG_FILE = "lib/guild_config.json"
-DEFAULT_PREFIX = ">"
+CONFIG_PATH = "sever_config.json"
 
 def load_config():
-    if not os.path.exists(CONFIG_FILE):
+    if not os.path.exists(CONFIG_PATH):
         return {}
-    with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def save_config(config):
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+async def save_config(config):
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
 
 def get_prefix(bot, message):
-    guild_id = str(message.guild.id) if message.guild else None
-    if guild_id and guild_id in bot.guild_config:
-        return bot.guild_config[guild_id].get("prefix", DEFAULT_PREFIX)
-    return DEFAULT_PREFIX
+    if message.guild is None:
+        return ">"  # default prefix for DM
+    guild_id = str(message.guild.id)
+    return bot.guild_config.get(guild_id, {}).get("prefix", ">")
 
-def set_prefix(bot, guild_id, new_prefix):
+async def set_prefix(voice_bot, guild_id, new_prefix):
     guild_id = str(guild_id)
-    if guild_id not in bot.guild_config:
-        bot.guild_config[guild_id] = {}
-    bot.guild_config[guild_id]["prefix"] = new_prefix
-    save_config(bot.guild_config)
+    config = voice_bot.bot.guild_config
+    if guild_id not in config:
+        config[guild_id] = {}
+    config[guild_id]["prefix"] = new_prefix
+    await save_config(config)
