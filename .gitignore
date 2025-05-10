@@ -2,3 +2,4 @@ py/.env
 /py/tools
 /py/lib/__pycache__
 /ffmpeg
+/py/config
