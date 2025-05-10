@@ -22,7 +22,7 @@
     - Set the prefix for commands in server
 ### Bot owner
 - `>shutdown`
-    - 關閉機器人
+    - shutdown the bot
 
 # Developer gide
 ## Private files format:
