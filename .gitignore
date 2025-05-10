@@ -2,5 +2,4 @@
 /py/.env
 /py/tools
 /ffmpeg
-/py/server_config.json
-*.json
+py/server_config.json
