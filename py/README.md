@@ -29,16 +29,16 @@
 On the same dir level of `main_ChatSpeaker.py`
 ### .env
 ```
-DC_BOT_TOKEN=`<your_bot_token>`
-ADMIN_ID=`<your_id>`
+DC_BOT_TOKEN=<your_bot_token>
+ADMIN_ID=<your_id>
 ```
 ### server_config.json
 ```
 {
-    "`<server_id>`": {
+    "<server_id>": {
         "prefix": ">"
     },
-    "`<server_id>`": {
+    "<server_id>": {
         "prefix": ">"
     }
 }
