@@ -1,6 +1,7 @@
 import asyncio
 import pytchat
 from lib.myTTS import get_audio, combine_audios, play_audio_sync
+from httpx import LocalProtocolError
 
 class ChatListener:
     def __init__(self, video_id, voice_bot, bot_voice_channel):
@@ -13,14 +14,30 @@ class ChatListener:
     async def start(self):
         """開始聊天室讀取"""
         while not self.stop_flag:
-            if self.chat.is_alive():
+            while self.chat.is_alive():
                 chat_data = self.chat.get()
                 if chat_data and chat_data.items:
                     await self.process_chat_data(chat_data)
-            else:
-                print("Chat data finished.")
+                await asyncio.sleep(3)  # 防止過多請求造成負擔
+            try:
+                self.chat.raise_for_status()
+            except LocalProtocolError as error:
+                print(f"httpx.LocalProtocolError: {error}")
+                print("Reconnecting Live Chat...")
+                self.chat.terminate()
+                self.stop_flag = True
+            except pytchat.exceptions.NoContents as error:
+                print(f"pytchat.exceptions.NoContents: {error}")
+                print("Live stream has ended.")
+                self.chat.terminate()
+                self.stop_flag = False
                 break
-            await asyncio.sleep(3)  # 防止過多請求造成負擔
+            except Exception as error:
+                print(f"Error: {error}")
+                self.stop_flag = False
+                break
+        self.chat.terminate()
+        print("Chat data finished.")
 
     def stop(self):
         """停止聊天室讀取"""
