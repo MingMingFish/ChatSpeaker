@@ -81,7 +81,7 @@ class VoiceBot:
     
     async def shutdown(self, ctx):
         """關閉機器人"""
-        await asyncio.sleep(5)  # 等待3秒鐘以確保其他任務完成
+        await asyncio.sleep(5)  # 等待5秒鐘以確保其他任務完成
         await self.bot.close()
 
     async def helps(self, ctx):
