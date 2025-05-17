@@ -13,6 +13,7 @@ class ChatListener:
 
     async def start(self):
         """開始聊天室讀取"""
+        self.continue_flag = True
         while self.continue_flag:
             while self.chat.is_alive():
                 chat_data = self.chat.get()
@@ -41,7 +42,9 @@ class ChatListener:
 
     def stop(self):
         """停止聊天室讀取"""
-        self.continue_flag = True
+        self.continue_flag = False
+        if self.chat.is_alive():
+            self.chat.terminate()
 
     async def process_chat_data(self, chat_data):
         """處理聊天室訊息"""

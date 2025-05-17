@@ -44,7 +44,7 @@ class VoiceBot:
         if video_id is None:
             return "請輸入有效的 YouTube 直播網址。"
 
-        if self.chat_reader is not None:
+        if self.chat_reader and self.chat_reader.chat is not None:
             self.chat_reader.stop() # 停止之前的聊天室讀取
             await ctx.send("已停止之前的聊天室朗讀。", delete_after = 3)
 
