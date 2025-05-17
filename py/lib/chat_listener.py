@@ -29,7 +29,7 @@ class ChatListener:
                 self.chat.terminate()
                 self.continue_flag = True
             except pytchat.exceptions.NoContents as error:
-                print(f"pytchat.exceptions.NoContents: {error}")
+                # print(f"pytchat.exceptions.NoContents: {error}")
                 # print("Live stream has ended.")
                 await ctx.send("Live stream has ended.", delete_after=60)
                 self.chat.terminate()
@@ -40,9 +40,8 @@ class ChatListener:
                 self.continue_flag = False
                 break
         self.chat.terminate()
-        # print("Chat data finished.")
-        # await ctx.send("Chat reading has been ended.", delete_after=60)
         self.voice_bot.chat_reader = None
+        print("Chat reader has ended.")
 
     def stop(self):
         """停止聊天室讀取"""
