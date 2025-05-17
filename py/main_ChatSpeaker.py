@@ -8,8 +8,9 @@ from lib.myCommands import setup_commands
 from lib.events import setup_events
 from lib.guild_config import get_prefix, load_config
 
-# 降低語音播報player的日誌提示級別，僅顯示錯誤和警告
+# 降低指定類別的日誌提示級別，僅顯示錯誤和警告
 logging.getLogger("discord.player").setLevel(logging.WARNING)
+logging.getLogger("discord.gateway").setLevel(logging.WARNING)
 
 # 載入環境變數
 load_dotenv()
