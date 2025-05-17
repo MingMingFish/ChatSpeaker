@@ -9,11 +9,11 @@ class ChatListener:
         self.chat = pytchat.create(video_id, interruptable=False)
         self.voice_bot = voice_bot
         self.bot_voice_channel = bot_voice_channel
-        self.stop_flag = False
+        self.continue_flag = True
 
     async def start(self):
         """開始聊天室讀取"""
-        while not self.stop_flag:
+        while self.continue_flag:
             while self.chat.is_alive():
                 chat_data = self.chat.get()
                 if chat_data and chat_data.items:
@@ -25,23 +25,23 @@ class ChatListener:
                 print(f"httpx.LocalProtocolError: {error}")
                 print("Reconnecting Live Chat...")
                 self.chat.terminate()
-                self.stop_flag = True
+                self.continue_flag = True
             except pytchat.exceptions.NoContents as error:
                 print(f"pytchat.exceptions.NoContents: {error}")
                 print("Live stream has ended.")
                 self.chat.terminate()
-                self.stop_flag = False
+                self.continue_flag = False
                 break
             except Exception as error:
                 print(f"Error: {error}")
-                self.stop_flag = False
+                self.continue_flag = False
                 break
         self.chat.terminate()
         print("Chat data finished.")
 
     def stop(self):
         """停止聊天室讀取"""
-        self.stop_flag = True
+        self.continue_flag = True
 
     async def process_chat_data(self, chat_data):
         """處理聊天室訊息"""
