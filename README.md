@@ -1,7 +1,7 @@
 # ChatSpeaker - Discord Bot
 ## Commands
 ### General commands
-- `>help`
+- `>helps`
     - show helps
 - `>join`
     - Join the voice channel (to the vc where the user who sent cmd)
