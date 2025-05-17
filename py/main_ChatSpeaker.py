@@ -14,7 +14,6 @@ logging.getLogger("discord.player").setLevel(logging.WARNING)
 # 載入環境變數
 load_dotenv()
 TOKEN = os.getenv("DC_BOT_TOKEN")
-prefix = ">"  # 指令前綴符號
 # Bot基礎設定
 intents = discord.Intents.default()
 intents.message_content = True
