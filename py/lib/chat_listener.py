@@ -11,7 +11,7 @@ class ChatListener:
         self.continue_flag = True
         self.chat = None # 尚未建立聊天室實例
 
-    async def start(self):
+    async def start(self, ctx):
         """開始聊天室讀取"""
         self.chat = pytchat.create(self.video_id, interruptable=False)
         self.continue_flag = True
@@ -30,7 +30,8 @@ class ChatListener:
                 self.continue_flag = True
             except pytchat.exceptions.NoContents as error:
                 print(f"pytchat.exceptions.NoContents: {error}")
-                print("Live stream has ended.")
+                # print("Live stream has ended.")
+                await ctx.send("Live stream has ended.", delete_after=60)
                 self.chat.terminate()
                 self.continue_flag = False
                 break
@@ -39,7 +40,8 @@ class ChatListener:
                 self.continue_flag = False
                 break
         self.chat.terminate()
-        print("Chat data finished.")
+        # print("Chat data finished.")
+        # await ctx.send("Chat reading has been ended.", delete_after=60)
         self.voice_bot.chat_reader = None
 
     def stop(self):
