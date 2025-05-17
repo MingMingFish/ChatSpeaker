@@ -6,13 +6,14 @@ from httpx import LocalProtocolError
 class ChatListener:
     def __init__(self, video_id, voice_bot, bot_voice_channel):
         self.video_id = video_id
-        self.chat = pytchat.create(video_id, interruptable=False)
         self.voice_bot = voice_bot
         self.bot_voice_channel = bot_voice_channel
         self.continue_flag = True
+        self.chat = None # 尚未建立聊天室實例
 
     async def start(self):
         """開始聊天室讀取"""
+        self.chat = pytchat.create(self.video_id, interruptable=False)
         self.continue_flag = True
         while self.continue_flag:
             while self.chat.is_alive():
@@ -39,6 +40,7 @@ class ChatListener:
                 break
         self.chat.terminate()
         print("Chat data finished.")
+        self.voice_bot.chat_reader = None
 
     def stop(self):
         """停止聊天室讀取"""

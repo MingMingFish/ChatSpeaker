@@ -50,13 +50,17 @@ class VoiceBot:
 
         # 初始化 ChatListener 並以非阻塞方式啟動聊天室讀取
         self.chat_reader = chat_listener.ChatListener(video_id, self, self.voice_client)
-        asyncio.create_task(self.chat_reader.start())  # 使用 asyncio.create_task 來非阻塞地啟動
+        chat_stat = asyncio.create_task(self.chat_reader.start())  # 使用 asyncio.create_task 來非阻塞地啟動
         return "開始朗讀聊天室。"
 
     async def stop_yt_chat(self, ctx):
         """停止朗讀YouTube聊天室內容"""
-        self.chat_reader.stop()  # 停止聊天室讀取
-        return "已停止朗讀聊天室。"
+        if self.chat_reader is not None:
+            self.chat_reader.stop()  # 停止聊天室讀取
+            self.chat_reader = None
+            return "已停止朗讀聊天室。"
+        else:
+            return "無正在朗讀的聊天室"
 
     async def say(self, ctx, *, text):
         """朗讀指定的文字"""
