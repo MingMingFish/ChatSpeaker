@@ -84,7 +84,7 @@ class VoiceBot:
         await asyncio.sleep(5)  # 等待3秒鐘以確保其他任務完成
         await self.bot.close()
 
-    async def helps():
+    async def helps(self, ctx):
         """顯示幫助訊息"""
         help_message = (
             "🔊 朗讀機器人指令列表：",
