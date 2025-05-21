@@ -1,5 +1,5 @@
-/py/lib/__pycache__
-/py/.env
-/py/tools
+/lib/__pycache__
+/.env
+/tools
 /ffmpeg
-/py/server_config.json
+/server_config.json
