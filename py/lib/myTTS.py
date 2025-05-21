@@ -6,6 +6,7 @@ from io import BytesIO
 # pip install langid
 from lib.lang_detect import detect_language_for_gTTS  # 引入語言偵測函式庫
 from pydub import AudioSegment # Please add "/ffmpeg/bin" to system environment variable manually
+import shutil
 
 async def get_audio(text, language=None):
     # 使用 gTTS 和自動偵測語言
@@ -40,7 +41,8 @@ async def combine_audios(*audios: BytesIO) -> BytesIO:
     return output
 
 async def play_audio(channel, audio):
-    ffmpeg_path = os.path.join("tools", "ffmpeg.exe")
+    ffmpeg_path = shutil.which("ffmpeg")
+    # ffmpeg_path = os.path.join("tools", "ffmpeg.exe")
     while channel.is_playing():
         await asyncio.sleep(1)
     channel.play(discord.FFmpegPCMAudio(source=audio, executable=ffmpeg_path, pipe=True))
