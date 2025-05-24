@@ -1,4 +1,4 @@
-import os
+# import os
 import asyncio
 import discord
 from gtts import gTTS # pip install gTTS
