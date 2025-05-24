@@ -14,8 +14,8 @@ class AudioQueueManager:
         if not self.playing_flags[voice_client.channel.id]:
             asyncio.create_task(self.start_playing(voice_client.channel.id))
 
-    def is_empty(self) -> bool:
-        return not self.queue
+    def is_empty(self, channel_id) -> bool:
+        return self.queues[channel_id].empty()
 
     async def start_playing(self, channel_id):
         self.playing_flags[channel_id] = True
@@ -29,8 +29,8 @@ class AudioQueueManager:
                     target_channel = voice_client.channel  # 取得原本的語音頻道
                     voice_client = await target_channel.connect()
                     print(f"[audio_queue] Bot 重新加入語音頻道 {target_channel.name}")
-                except discord.ClientException:
-                    print("[audio_queue] 無法重新加入語音頻道，可能已被踢出或缺權限")
+                except discord.ClientException as e:
+                    print(f"[audio_queue] Fail to reconnect to voice channel: [{type(e).__name__}] {e}")
                     continue
             try:
                 ffmpeg_path = shutil.which("ffmpeg")
