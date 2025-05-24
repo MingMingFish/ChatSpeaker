@@ -65,7 +65,7 @@ def setup_events(bot: commands.Bot, voice_bot):
             should_disconnect_after = False
             should_return_to_original = False
 
-            while bot_voice_client is not None and bot_voice_client.is_playing():
+            while bot_voice_client is not None and bot_voice_client.is_playing() and not audio_queue.is_empty():
                 await asyncio.sleep(0.1)
 
             if bot_voice_client is None:

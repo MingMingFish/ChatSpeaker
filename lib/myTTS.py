@@ -1,6 +1,5 @@
 # import os
 import asyncio
-import discord
 from gtts import gTTS # pip install gTTS
 from io import BytesIO
 # pip install langid
@@ -41,4 +40,4 @@ async def combine_audios(*audios: BytesIO) -> BytesIO:
     return output
 
 async def play_audio_sync(voice_channel, audio):
-    await audio_queue.add_to_queue(voice_channel, audio)
+    await audio_queue.enqueue(voice_channel, audio)
