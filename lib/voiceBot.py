@@ -69,7 +69,7 @@ class VoiceBot:
 
         language = await lang_detect.detect_language_for_gTTS(text)
         audio = await myTTS.get_audio(text, language)
-        await myTTS.play_audio_sync(self.voice_client, audio)
+        await myTTS.enqueue_audio(self.voice_client, audio)
         return None
     async def read_out(self, ctx):
         """啟用朗讀模式"""

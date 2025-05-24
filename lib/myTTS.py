@@ -1,4 +1,3 @@
-# import os
 import asyncio
 from gtts import gTTS # pip install gTTS
 from io import BytesIO
@@ -39,5 +38,5 @@ async def combine_audios(*audios: BytesIO) -> BytesIO:
     output = await asyncio.to_thread(sync_combine)
     return output
 
-async def play_audio_sync(voice_channel, audio):
+async def enqueue_audio(voice_channel, audio):
     await audio_queue.enqueue(voice_channel, audio)

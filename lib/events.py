@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 import asyncio
-from lib.myTTS import get_audio, play_audio_sync, combine_audios
+from lib.myTTS import get_audio, enqueue_audio, combine_audios
 from lib.guild_config import get_prefix
 from lib.audio_queue import audio_queue
 
@@ -39,7 +39,7 @@ def setup_events(bot: commands.Bot, voice_bot):
                     await get_audio(message.content)              # 訊息內容
                 ]
                 audio = await combine_audios(*audios)  # 合併音訊
-                await play_audio_sync(voice_client, audio)
+                await enqueue_audio(voice_client, audio)
             # end if
         await bot.process_commands(message)  # 處理其他指令
 
@@ -65,7 +65,7 @@ def setup_events(bot: commands.Bot, voice_bot):
             should_disconnect_after = False
             should_return_to_original = False
 
-            while bot_voice_client is not None and bot_voice_client.is_playing() and not audio_queue.is_empty():
+            while bot_voice_client is not None and bot_voice_client.is_playing() and not audio_queue.queues():
                 await asyncio.sleep(0.1)
 
             if bot_voice_client is None:
@@ -87,7 +87,7 @@ def setup_events(bot: commands.Bot, voice_bot):
             # 播放音訊
             while bot_voice_client is None or not bot_voice_client.is_connected():
                 await asyncio.sleep(0.5)
-            await play_audio_sync(bot_voice_client, audio)
+            await enqueue_audio(bot_voice_client, audio)
 
             while bot_voice_client.is_playing():
                 await asyncio.sleep(1)

@@ -1,6 +1,6 @@
 import asyncio
 import pytchat
-from lib.myTTS import get_audio, combine_audios, play_audio_sync
+from lib.myTTS import get_audio, combine_audios, enqueue_audio
 from httpx import LocalProtocolError
 
 class ChatListener:
@@ -66,4 +66,4 @@ class ChatListener:
         # 語音合成
         audio = await combine_audios(*audios)
         # 播放語音
-        await play_audio_sync(self.bot_voice_channel, audio)
+        await enqueue_audio(self.bot_voice_channel, audio)
