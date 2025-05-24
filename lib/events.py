@@ -45,57 +45,27 @@ def setup_events(bot: commands.Bot, voice_bot):
 
     @bot.event
     async def on_voice_state_update(member, before, after):
-        # 排除 bot 自己進出語音的事件
-        if member.bot:
+        if member.bot: # 機器人自己
             return
 
-        # 偵測加入語音頻道
+        # 判斷活動狀態
         if before.channel != after.channel:
-            guild = member.guild # 獲取伺服器對象
+            guild = member.guild
             if after.channel is not None:
-                target_channel = after.channel # 獲取使用者的語音頻道
+                target_channel = after.channel
                 activity_message = '加入聊天'
             else:
-                target_channel = before.channel # 獲取使用者的語音頻道
+                target_channel = before.channel
                 activity_message = '離開聊天'
-            # 取得 bot 的 voice client
-            bot_voice_client = discord.utils.get(bot.voice_clients, guild=guild)
-            original_channel = bot_voice_client.channel if bot_voice_client else None
-            # 決定是否要移動/加入語音頻道
-            should_disconnect_after = False
-            should_return_to_original = False
 
-            while bot_voice_client is not None and bot_voice_client.is_playing() and not audio_queue.queues():
-                await asyncio.sleep(0.1)
-
-            if bot_voice_client is None:
-                # bot 沒有連線，加入使用者的語音頻道
-                bot_voice_client = await target_channel.connect()
-                should_disconnect_after = True
-            elif bot_voice_client.channel != target_channel:
-                # bot 在其他語音頻道
-                await bot_voice_client.move_to(target_channel)
-                should_return_to_original = True
-
-            # 播報使用者名稱
+            # 合成播報語音
             username = member.display_name
             audios = [
                 await get_audio(username),
                 await get_audio(activity_message, 'zh-TW')
-                ]
-            audio = await combine_audios(*audios)
-            # 播放音訊
-            while bot_voice_client is None or not bot_voice_client.is_connected():
-                await asyncio.sleep(0.5)
-            await enqueue_audio(bot_voice_client, audio)
+            ]
+            audio_path = await combine_audios(*audios)
 
-            while bot_voice_client.is_playing():
-                await asyncio.sleep(1)
-            # 播報後離開或返回語音頻道
-            while audio_queue.playing_flags.get(bot_voice_client.channel.id, False):
-                await asyncio.sleep(0.5)
+            # 加入全域佇列：由 queue 負責播放、移動、回原任務頻道
+            await audio_queue.enqueue(target_channel, audio_path)
 
-            if should_return_to_original and original_channel:
-                await bot_voice_client.move_to(original_channel)
-            elif should_disconnect_after:
-                await bot_voice_client.disconnect()

@@ -29,7 +29,7 @@ class AudioQueueManager:
                     await self.voice_client.move_to(target_channel)
 
                 ffmpeg_path = shutil.which("ffmpeg")
-                self.voice_client.play(discord.FFmpegPCMAudio(audio_path, executable=ffmpeg_path))
+                self.voice_client.play(discord.FFmpegPCMAudio(audio_path, executable=ffmpeg_path, pipe=True))
 
                 while self.voice_client.is_playing():
                     await asyncio.sleep(0.5)
@@ -37,14 +37,14 @@ class AudioQueueManager:
             except discord.ClientException as e:
                 print(f"[audio_queue] ClientException: {e}")
             except Exception as e:
-                print(f"[audio_queue] 播放音訊時發生錯誤: [{type(e).__name__}] {e}")
+                print(f"[audio_queue] Fail to play audio: [{type(e).__name__}] {e}")
 
         # 播放結束後的處理
         if self.task_channel:
             try:
                 await self.voice_client.move_to(self.task_channel)
             except Exception as e:
-                print(f"[audio_queue] 返回任務頻道失敗: {e}")
+                print(f"[audio_queue] Fail to return channel: [{type(e).__name__}] {e}")
         else:
             try:
                 await self.voice_client.disconnect()

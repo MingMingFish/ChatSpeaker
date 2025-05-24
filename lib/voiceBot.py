@@ -1,6 +1,7 @@
 import asyncio
 from lib import chat_listener
 from lib import yt_url, lang_detect, myTTS
+from lib.audio_queue import audio_queue
 
 class VoiceBot:
     def __init__(self, bot):
@@ -19,16 +20,19 @@ class VoiceBot:
         if self.voice_client:   # 如果機器人已經在語音頻道中
             if(self.voice_client != user_voice_channel): # 如果在不同語音頻道
                 await self.voice_client.move_to(user_voice_channel) # 移動到使用者的語音頻道
+                audio_queue.task_channel = self.voice_client
             else: # 如果機器人已經在使用者的語音頻道中
                 return "已經在語音頻道中。"
         else: # 如果機器人不在語音頻道中，則連接到使用者的語音頻道
             self.voice_client = await user_voice_channel.connect()
+            audio_queue.task_channel = self.voice_client
         return f"已加入語音頻道：{self.voice_client.channel.name}"
 
     async def leave(self, ctx):
         """讓機器人離開語音頻道"""
         if ctx.voice_client:
             await ctx.voice_client.disconnect()
+            audio_queue.task_channel = None
             self.voice_client = None
             self.read_mode = False
             return "已離開語音頻道。"
