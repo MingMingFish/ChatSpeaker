@@ -20,9 +20,18 @@ class AudioQueueManager:
         queue = self.queues[channel_id]
 
         while not queue.empty():
+            while voice_client.is_playing():
+                await asyncio.sleep(0.5)
             voice_client, audio = await queue.get()
             if not voice_client.is_connected():
-                break
+                # 嘗試重新加入語音頻道
+                try:
+                    target_channel = voice_client.channel  # 取得原本的語音頻道
+                    voice_client = await target_channel.connect()
+                    print(f"[audio_queue] Bot reconnect {target_channel.name} successfully.")
+                except discord.ClientException:
+                    print("[audio_queue] 無法重新加入語音頻道，可能已被踢出或缺權限")
+                    continue
             ffmpeg_path = shutil.which("ffmpeg")
             voice_client.play(discord.FFmpegPCMAudio(source=audio, executable=ffmpeg_path, pipe=True))
             while voice_client.is_playing():
