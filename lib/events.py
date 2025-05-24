@@ -3,6 +3,7 @@ import discord
 import asyncio
 from lib.myTTS import get_audio, play_audio_sync, combine_audios
 from lib.guild_config import get_prefix
+from lib.audio_queue import audio_queue
 
 # 調用event函式庫
 def setup_events(bot: commands.Bot, voice_bot):
@@ -91,6 +92,9 @@ def setup_events(bot: commands.Bot, voice_bot):
             while bot_voice_client.is_playing():
                 await asyncio.sleep(1)
             # 播報後離開或返回語音頻道
+            while audio_queue.playing_flags.get(bot_voice_client.channel.id, False):
+                await asyncio.sleep(0.5)
+
             if should_return_to_original and original_channel:
                 await bot_voice_client.move_to(original_channel)
             elif should_disconnect_after:
