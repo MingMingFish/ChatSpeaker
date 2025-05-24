@@ -32,11 +32,14 @@ class AudioQueueManager:
                 except discord.ClientException:
                     print("[audio_queue] 無法重新加入語音頻道，可能已被踢出或缺權限")
                     continue
-            ffmpeg_path = shutil.which("ffmpeg")
-            voice_client.play(discord.FFmpegPCMAudio(source=audio, executable=ffmpeg_path, pipe=True))
-            while voice_client.is_playing():
-                await asyncio.sleep(0.5)
-            await asyncio.sleep(0.3)
+                try:
+                    ffmpeg_path = shutil.which("ffmpeg")
+                    voice_client.play(discord.FFmpegPCMAudio(source=audio, executable=ffmpeg_path, pipe=True))
+                    while voice_client.is_connected() and voice_client.is_playing():
+                        await asyncio.sleep(0.5)
+                except Exception as e:
+                    print(f"[audio_queue] 播放音訊時發生錯誤: [{type(e).__name__}] {e}")
+                    continue
 
         self.playing_flags[channel_id] = False
         # 若佇列空了且 bot 在語音中沒特別設置常駐，可自動離開（由調用端決定）
