@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 import asyncio
-from lib.myTTS import get_audio, enqueue_audio, combine_audios
+from lib.myTTS import get_audio, combine_audios
 from lib.guild_config import get_prefix
 from lib.audio_queue import audio_queue
 
@@ -38,8 +38,8 @@ def setup_events(bot: commands.Bot, voice_bot):
                     await get_audio("說", language="zh-TW"),      # 「說」字
                     await get_audio(message.content)              # 訊息內容
                 ]
-                audio = await combine_audios(*audios)  # 合併音訊
-                await enqueue_audio(voice_client, audio)
+                task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
+                await audio_queue.enqueue(voice_client, task_make_audio) # 加入全域佇列
             # end if
         await bot.process_commands(message)  # 處理其他指令
 
@@ -64,8 +64,7 @@ def setup_events(bot: commands.Bot, voice_bot):
                 await get_audio(username),
                 await get_audio(activity_message, 'zh-TW')
             ]
-            audio_path = await combine_audios(*audios)
-
-            # 加入全域佇列：由 queue 負責播放、移動、回原任務頻道
-            await audio_queue.enqueue(target_channel, audio_path)
+            # audio = await combine_audios(*audios)
+            task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
+            await audio_queue.enqueue(target_channel, task_make_audio) # 加入全域佇列
 

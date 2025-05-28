@@ -4,7 +4,6 @@ from io import BytesIO
 # pip install langid
 from lib.lang_detect import detect_language_for_gTTS  # 引入語言偵測函式庫
 from pydub import AudioSegment # Please add "/ffmpeg/bin" to system environment variable manually
-from lib.audio_queue import audio_queue
 
 async def get_audio(text, language=None):
     # 使用 gTTS 和自動偵測語言
@@ -37,6 +36,3 @@ async def combine_audios(*audios: BytesIO) -> BytesIO:
 
     output = await asyncio.to_thread(sync_combine)
     return output
-
-async def enqueue_audio(voice_channel, audio):
-    await audio_queue.enqueue(voice_channel, audio)

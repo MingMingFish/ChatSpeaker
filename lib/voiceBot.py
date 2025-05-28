@@ -11,6 +11,7 @@ class VoiceBot:
         self.chat_reader = None  # 用於存儲 ChatListener 實例
         # 用來載入伺服器設定 bot.guild_config 若 bot 無此屬性則使用空字典 
         self.guild_config = getattr(bot, "guild_config", {})
+        self.task_channel = audio_queue.task_channel  # 用來存儲任務頻道
 
     async def join(self, ctx):
         """讓機器人加入使用者所在的語音頻道"""
@@ -20,21 +21,21 @@ class VoiceBot:
         if self.voice_client:   # 如果機器人已經在語音頻道中
             if(self.voice_client != user_voice_channel): # 如果在不同語音頻道
                 await self.voice_client.move_to(user_voice_channel) # 移動到使用者的語音頻道
-                audio_queue.task_channel = self.voice_client
+                self.task_channel = self.voice_client
             else: # 如果機器人已經在使用者的語音頻道中
                 return "已經在語音頻道中。"
         else: # 如果機器人不在語音頻道中，則連接到使用者的語音頻道
             self.voice_client = await user_voice_channel.connect()
-            audio_queue.task_channel = self.voice_client
+            self.task_channel = self.voice_client
         return f"已加入語音頻道：{self.voice_client.channel.name}"
 
     async def leave(self, ctx):
         """讓機器人離開語音頻道"""
         if ctx.voice_client:
-            await ctx.voice_client.disconnect()
-            audio_queue.task_channel = None
-            self.voice_client = None
+            self.task_channel = None
             self.read_mode = False
+            await ctx.voice_client.disconnect()
+            self.voice_client = None
             return "已離開語音頻道。"
         else:
             return "機器人未在語音頻道中。"
@@ -73,7 +74,7 @@ class VoiceBot:
 
         language = await lang_detect.detect_language_for_gTTS(text)
         audio = await myTTS.get_audio(text, language)
-        await myTTS.enqueue_audio(self.voice_client, audio)
+        await audio_queue.enqueue(self.voice_client, audio)
         return None
     async def read_out(self, ctx):
         """啟用朗讀模式"""

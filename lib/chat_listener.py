@@ -1,6 +1,7 @@
 import asyncio
 import pytchat
-from lib.myTTS import get_audio, combine_audios, enqueue_audio
+from lib.myTTS import get_audio, combine_audios
+from lib.audio_queue import audio_queue
 from httpx import LocalProtocolError
 
 class ChatListener:
@@ -63,7 +64,6 @@ class ChatListener:
             await get_audio("說", language='zh-TW'), # "說"字
             await get_audio(message.message), # 訊息
         ]
-        # 語音合成
-        audio = await combine_audios(*audios)
-        # 播放語音
-        await enqueue_audio(self.bot_voice_channel, audio)
+        # 語音加入佇列等待播放
+        task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
+        await audio_queue.enqueue(self.bot_voice_channel, task_make_audio) # 加入全域佇列

@@ -6,21 +6,32 @@ from typing import Optional
 class AudioQueueManager:
     def __init__(self):
         self.queue = asyncio.Queue()  # 全域播放佇列
-        self.is_playing = False
+        self.is_playing_queue = False
         self.voice_client: Optional[discord.VoiceClient] = None
         self.task_channel: Optional[discord.VoiceChannel] = None  # 任務頻道
 
-    async def enqueue(self, channel: discord.VoiceChannel, audio_path: str):
-        await self.queue.put((channel, audio_path))
-        if not self.is_playing:
+    async def enqueue(self, channel: discord.VoiceChannel, audio_or_player):
+        await self.queue.put((channel, audio_or_player))
+        if not self.is_playing_queue:
             asyncio.create_task(self.start_playing())
 
     async def start_playing(self):
-        self.is_playing = True
+        self.is_playing_queue = True
+        ffmpeg_path = shutil.which("ffmpeg")
 
         while not self.queue.empty():
-            target_channel, audio_path = await self.queue.get()
+            target_channel, audio_or_player = await self.queue.get()
 
+            if asyncio.iscoroutine(audio_or_player):
+                audio_or_player = await audio_or_player
+            elif isinstance(audio_or_player, asyncio.Future):
+                audio_or_player = await audio_or_player
+            elif callable(audio_or_player):
+                result = audio_or_player()
+                if asyncio.iscoroutine(result):
+                    audio_or_player = await result
+                else:
+                    audio_or_player = result
             try:
                 # 如果尚未連線，或在錯誤的頻道，就移動或連線
                 if self.voice_client is None or not self.voice_client.is_connected():
@@ -28,8 +39,7 @@ class AudioQueueManager:
                 elif self.voice_client.channel.id != target_channel.id:
                     await self.voice_client.move_to(target_channel)
 
-                ffmpeg_path = shutil.which("ffmpeg")
-                self.voice_client.play(discord.FFmpegPCMAudio(audio_path, executable=ffmpeg_path, pipe=True))
+                self.voice_client.play(discord.FFmpegPCMAudio(audio_or_player, executable=ffmpeg_path, pipe=True))
 
                 while self.voice_client.is_playing():
                     await asyncio.sleep(0.5)
@@ -40,7 +50,7 @@ class AudioQueueManager:
                 print(f"[audio_queue] Fail to play audio: [{type(e).__name__}] {e}")
 
         # 播放結束後的處理
-        if self.task_channel:
+        if self.task_channel and not self.queue.empty():
             try:
                 await self.voice_client.move_to(self.task_channel)
             except Exception as e:
@@ -50,7 +60,7 @@ class AudioQueueManager:
                 await self.voice_client.disconnect()
             except Exception:
                 pass
-        self.is_playing = False
+        self.is_playing_queue = False
 
 # 建立實例
 audio_queue = AudioQueueManager()
