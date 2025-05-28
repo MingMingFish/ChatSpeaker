@@ -30,7 +30,7 @@ async def combine_audios(*audios: BytesIO) -> BytesIO:
             segment = AudioSegment.from_file(audio_io, format="mp3")
             combined += segment  # 串接音訊
         output = BytesIO()
-        combined.export(output, format="mp3")
+        combined.export(output, format="wav") # 改為 WAV 格式，避免header錯亂
         output.seek(0)
         return output
 
