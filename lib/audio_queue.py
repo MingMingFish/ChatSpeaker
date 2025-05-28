@@ -39,7 +39,7 @@ class AudioQueueManager:
                 elif self.voice_client.channel.id != target_channel.id:
                     await self.voice_client.move_to(target_channel)
 
-                self.voice_client.play(discord.FFmpegPCMAudio(audio_or_player, executable=ffmpeg_path, pipe=True))
+                self.voice_client.play(discord.FFmpegPCMAudio(audio_or_player, executable=ffmpeg_path, pipe=True, options='-ac 2')) # '-ac 2' 單聲道轉多聲道
 
                 while self.voice_client.is_playing():
                     await asyncio.sleep(0.5)
