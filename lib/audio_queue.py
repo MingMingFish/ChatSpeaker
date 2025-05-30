@@ -1,14 +1,26 @@
 import asyncio
 import discord
 import shutil
-from typing import Optional
-
+import traceback
 class AudioQueueManager:
-    def __init__(self):
+    def __init__(self, voice_bot):
+        self.voice_bot = voice_bot
         self.queue = asyncio.Queue()  # 全域播放佇列
         self.is_playing_queue = False
-        self.voice_client: Optional[discord.VoiceClient] = None
-        self.task_channel: Optional[discord.VoiceChannel] = None  # 任務頻道
+    
+    # 將 voice_bot 的屬性和方法暴露給 AudioQueueManager
+    @property               # 將方法包裝成屬性
+    def voice_client(self): # 當呼叫 self.voice_client 時，實際上是呼叫 voice_bot.voice_client
+        return self.voice_bot.voice_client
+    @property
+    def task_channel(self):
+        return self.voice_bot.task_channel
+    @voice_client.setter  # 包裝起來的屬性的 setter 方法
+    def voice_client(self, value):
+        self.voice_bot.voice_client = value
+    @task_channel.setter    # 包裝起來的屬性的 setter 方法
+    def task_channel(self, value):
+        self.voice_bot.task_channel = value
 
     async def enqueue(self, channel: discord.VoiceChannel, audio_or_player):
         await self.queue.put((channel, audio_or_player))
@@ -35,7 +47,7 @@ class AudioQueueManager:
             try:
                 # 如果尚未連線，或在錯誤的頻道，就移動或連線
                 if self.voice_client is None or not self.voice_client.is_connected():
-                    self.voice_client = await target_channel.connect()
+                    self.voice_client = await target_channel.connect(reconnect=True, timeout=10)
                 elif self.voice_client.channel.id != target_channel.id:
                     await self.voice_client.move_to(target_channel)
 
@@ -48,11 +60,13 @@ class AudioQueueManager:
                 print(f"[audio_queue] ClientException: {e}")
             except Exception as e:
                 print(f"[audio_queue] Fail to play audio: [{type(e).__name__}] {e}")
+                traceback.print_exc()
 
         # 播放結束後的處理
-        if self.task_channel and not self.queue.empty():
+        if self.task_channel or not self.queue.empty():
             try:
-                await self.voice_client.move_to(self.task_channel)
+                if self.voice_client.channel.id != self.task_channel.id:
+                    await self.voice_client.move_to(self.task_channel)
             except Exception as e:
                 print(f"[audio_queue] Fail to return channel: [{type(e).__name__}] {e}")
         else:
@@ -61,6 +75,3 @@ class AudioQueueManager:
             except Exception:
                 pass
         self.is_playing_queue = False
-
-# 建立實例
-audio_queue = AudioQueueManager()

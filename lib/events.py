@@ -3,7 +3,6 @@ import discord
 import asyncio
 from lib.myTTS import get_audio, combine_audios
 from lib.guild_config import get_prefix
-from lib.audio_queue import audio_queue
 
 # 調用event函式庫
 def setup_events(bot: commands.Bot, voice_bot):
@@ -23,14 +22,7 @@ def setup_events(bot: commands.Bot, voice_bot):
         if message.author.bot:
             return
         if not message.content.startswith(get_prefix(bot, message)):
-            if (
-            # if 條件：
-                voice_bot.read_mode and
-                message.guild and
-                message.guild.voice_client and
-                message.guild.voice_client.is_connected()):
-            # if 內容：
-                voice_client = message.guild.voice_client
+            if voice_bot.read_mode:
                 audios = [
                     await get_audio(message.author.display_name), # 發言者名稱
                     await get_audio("在", language="zh-TW"),      # 「在」字
@@ -39,13 +31,22 @@ def setup_events(bot: commands.Bot, voice_bot):
                     await get_audio(message.content)              # 訊息內容
                 ]
                 task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
-                await audio_queue.enqueue(voice_client, task_make_audio) # 加入全域佇列
+                await voice_bot.audio_queue.enqueue(voice_bot.task_channel, task_make_audio) # 加入全域佇列
             # end if
         await bot.process_commands(message)  # 處理其他指令
 
     @bot.event
     async def on_voice_state_update(member, before, after):
         if member.bot: # 機器人自己
+            if after.channel is None: # 離開語音頻道
+                voice_bot.task_channel = None
+                voice_bot.voice_client = None
+                if voice_bot.chat_reader is not None:
+                    voice_bot.chat_reader.stop()
+                    voice_bot.chat_reader = None
+                if voice_bot.read_mode:
+                    voice_bot.read_mode = False
+            
             return
 
         # 判斷活動狀態
@@ -66,5 +67,5 @@ def setup_events(bot: commands.Bot, voice_bot):
             ]
             # audio = await combine_audios(*audios)
             task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
-            await audio_queue.enqueue(target_channel, task_make_audio) # 加入全域佇列
+            await voice_bot.audio_queue.enqueue(target_channel, task_make_audio) # 加入全域佇列
 
