@@ -70,6 +70,7 @@ def setup_commands(bot, voice_bot):
             for line in msg:
                 message += line + "\n"
             await ctx.send(message)
+            await ctx.message.delete()
         else:
             await ctx.send("Error: 沒有可用的指令。")
 
