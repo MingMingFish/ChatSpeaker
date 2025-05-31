@@ -2,7 +2,7 @@ def setup_commands(bot, voice_bot):
     from dotenv import load_dotenv
     from os import getenv
     from discord.ext import commands
-    from lib.guild_config import set_prefix
+    from lib.guild_config import set_prefix, get_prefix
     load_dotenv()
     ADMIN_ID = int(getenv("ADMIN_ID"))
 
@@ -36,8 +36,11 @@ def setup_commands(bot, voice_bot):
         await ctx.message.delete()
 
     @bot.command(name="say", help="say <text> | Say the words")
-    async def _say(ctx, *, text):
-        msg = await voice_bot.say(ctx, text=text)
+    async def _say(ctx, *, text=''):
+        if not text:
+            msg = f"請輸入要朗讀的文字。格式：`{get_prefix(voice_bot, ctx)}say <text>`"
+        else:
+            msg = await voice_bot.say(ctx, text=text)
         if msg:
             await ctx.send(msg, delete_after=3)
         await ctx.message.delete()
@@ -60,7 +63,8 @@ def setup_commands(bot, voice_bot):
 
     @bot.command(name="helps", help="Shows more helps info.")
     async def _helps(ctx):
-        msg = await voice_bot.helps(ctx)
+        prefix = get_prefix(voice_bot, ctx)
+        msg = await voice_bot.helps(ctx, prefix=prefix)
         message = ""
         if msg:
             for line in msg:

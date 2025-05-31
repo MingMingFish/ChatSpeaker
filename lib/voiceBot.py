@@ -86,7 +86,8 @@ class VoiceBot:
         """朗讀指定的文字"""
         msg = await self.join(ctx)  # 確保已加入語音頻道
         await ctx.send(msg, delete_after=3)
-
+        if not text:
+            return f"請輸入要朗讀的文字。格式：`{ctx.prefix}say <text>`"
         language = await lang_detect.detect_language_for_gTTS(text)
         audio = await myTTS.get_audio(text, language)
         await self.audio_queue.enqueue(self.voice_client.channel, audio)
@@ -108,28 +109,28 @@ class VoiceBot:
         await asyncio.sleep(5)  # 等待5秒鐘以確保其他任務完成
         await self.bot.close()
 
-    async def helps(self, ctx):
+    async def helps(self, ctx, prefix: str = ">"):
         """顯示幫助訊息"""
         help_message = (
             "🔊 朗讀機器人指令列表：",
             ">>> 指令列表：",
-            "- `>helps`",
+            f"- `{prefix}helps`",
             "    - 顯示指令列表",
-            "- `>join`",
+            f"- `{prefix}join`",
             "    - 讓機器人加入語音頻道",
-            "- `>leave`",
+            f"- `{prefix}leave`",
             "    - 讓機器人離開語音頻道",
-            "- `>say_yt_chat <YouTube直播網址>`",
+            f"- `{prefix}say_yt_chat <YouTube直播網址>`",
             "    - 朗讀YouTube聊天室內容",
-            "- `>stop_yt_chat`",
+            f"- `{prefix}stop_yt_chat`",
             "    - 停止朗讀YouTube聊天室內容",
-            "- `>say <文字>`",
+            f"- `{prefix}say <文字>`",
             "    - 朗讀指定的文字",
-            "- `>readout`",
+            f"- `{prefix}readout`",
             "    - 啟用朗讀模式(播報伺服器訊息)",
-            "- `>noreadout`",
+            f"- `{prefix}noreadout`",
             "    - 停用朗讀模式",
-            "- `>shutdown`",
+            f"- `{prefix}shutdown`",
             "    - 關閉機器人",
         )
         return help_message
