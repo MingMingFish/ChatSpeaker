@@ -44,6 +44,22 @@ ADMIN_ID=<your_id>
 }
 ```
 ## Notes:
-Put `ffmpeg.exe` in `py/tools`, 
-and make sure you set ffmpeg in to system environment variable
-Download ffmpeg from: [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds/releases)
+### Remember to pip the requirements
+```
+pip3 install -r requirements.txt
+```
+### Windows
+ - Make sure you set ffmpeg folder in to system environment variable if you are using Windows.
+ - Download ffmpeg from: [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds/releases)
+### Linux
+Download FFmpeg:
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install ffmpeg
+```
+Check installation:
+```
+ffmpeg -version
+```
+
