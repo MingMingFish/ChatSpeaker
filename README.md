@@ -24,7 +24,7 @@
 - `>shutdown`
     - shutdown the bot
 
-# Developer gide
+# Developer guide
 ## Private files format:
 On the same dir level of `main_ChatSpeaker.py`
 ### .env
