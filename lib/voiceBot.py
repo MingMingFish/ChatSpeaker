@@ -88,10 +88,13 @@ class VoiceBot:
         await ctx.send(msg, delete_after=3)
         if not text:
             return f"請輸入要朗讀的文字。格式：`{ctx.prefix}say <text>`"
-        language = await lang_detect.detect_language_for_gTTS(text)
-        audio = await myTTS.get_audio(text, language)
-        await self.audio_queue.enqueue(self.voice_client.channel, audio)
-        return None
+        try:
+            language = await lang_detect.detect_language_for_gTTS(text)
+            audio = await myTTS.get_audio(text, language)
+            await self.audio_queue.enqueue(self.voice_client.channel, audio)
+            return None
+        except Exception as e:
+            return f"朗讀錯誤：{e}"
     async def read_out(self, ctx):
         """啟用朗讀模式"""
         msg = await self.join(ctx)  # 確保已加入語音頻道
