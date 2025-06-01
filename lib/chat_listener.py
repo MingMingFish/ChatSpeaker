@@ -2,12 +2,13 @@ import asyncio
 import pytchat
 from lib.myTTS import get_audio, combine_audios
 from httpx import LocalProtocolError
+from lib.guildManager import GuildManager
 
 class ChatListener:
-    def __init__(self, video_id, voice_bot, bot_voice_channel):
+    def __init__(self, video_id: str, guild_id: int, guild_manager: GuildManager):
         self.video_id = video_id
-        self.voice_bot = voice_bot
-        self.bot_voice_channel = bot_voice_channel
+        self.guild_id = guild_id
+        self.guild_manager = guild_manager
         self.continue_flag = True
         self.chat = None # 尚未建立聊天室實例
 
@@ -15,6 +16,13 @@ class ChatListener:
         """開始聊天室讀取"""
         self.chat = pytchat.create(self.video_id, interruptable=False)
         self.continue_flag = True
+
+        guild_state = self.guild_manager.get(self.guild_id)
+        if not guild_state:
+            await ctx.send("Guild 狀態不存在，無法啟動聊天室監聽。")
+            return
+        guild_state.chat_reader = self
+
         while self.continue_flag:
             while self.chat.is_alive():
                 chat_data = self.chat.get()
@@ -39,14 +47,15 @@ class ChatListener:
                 print(f"Error: {error}")
                 self.continue_flag = False
                 break
+
         self.chat.terminate()
-        self.voice_bot.chat_reader = None
+        guild_state.chat_reader = None
         print("Chat reader has ended.")
 
     def stop(self):
         """停止聊天室讀取"""
         self.continue_flag = False
-        if self.chat.is_alive():
+        if self.chat and self.chat.is_alive():
             self.chat.terminate()
 
     async def process_chat_data(self, chat_data):
@@ -57,6 +66,10 @@ class ChatListener:
 
     async def play_message(self, message):
         """處理訊息並進行語音播放"""
+        guild_state = self.guild_manager.get(self.guild_id)
+        if not guild_state:
+            return
+
         # 語音生成
         audios = [
             await get_audio(message.author.name), # 名字
@@ -65,4 +78,4 @@ class ChatListener:
         ]
         # 語音加入佇列等待播放
         task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
-        await self.voice_bot.audio_queue.enqueue(self.bot_voice_channel, task_make_audio) # 加入全域佇列
+        await guild_state.audio_queue.enqueue(guild_state.task_channel, task_make_audio) # 加入全域佇列
