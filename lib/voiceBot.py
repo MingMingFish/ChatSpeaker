@@ -1,5 +1,5 @@
 import asyncio
-from lib import chat_listener
+from lib.chat_listener import ChatListener
 from lib import yt_url, lang_detect, myTTS
 from lib.audio_queue import AudioQueueManager
 
@@ -69,7 +69,7 @@ class VoiceBot:
             await ctx.send("已停止之前的聊天室朗讀。", delete_after = 3)
 
         # 初始化 ChatListener 並以非阻塞方式啟動聊天室讀取
-        self.chat_reader = chat_listener.ChatListener(video_id, self, self.voice_client.channel)
+        self.chat_reader = ChatListener(video_id, self, self.voice_client.channel)
         asyncio.create_task(self.chat_reader.start(ctx)) # 使用 asyncio.create_task 來非阻塞地啟動
         return "開始朗讀聊天室。"
 
