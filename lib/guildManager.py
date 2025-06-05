@@ -27,7 +27,7 @@ class GuildManager:
     def all(self) -> list[GuildBotState]:
         return list(self.guild_states.values())
 
-    def ensure(self, guild_id: int) -> GuildBotState:
+    def get_state(self, guild_id: int) -> GuildBotState:
         """🆕 若 guild_id 尚未註冊狀態，則建立並回傳"""
         if guild_id not in self.guild_states:
             state = GuildBotState(guild_id)
@@ -36,7 +36,7 @@ class GuildManager:
 
     def create_chat_listener(self, guild_id: int) -> ChatListener:
         """🆕 建立 ChatListener 並儲存"""
-        state = self.ensure(guild_id)
+        state = self.get_state(guild_id)
         listener = ChatListener(guild_id, self)
         state.chat_reader = listener
         return listener
