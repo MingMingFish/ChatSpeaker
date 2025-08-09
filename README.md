@@ -14,7 +14,8 @@ This is a Discord bot that I made for my visually impaired friend, whitch can:
 
 ### Log
  - Bot repeatedly connect to vc and fail.
-    - reason by issue #10207 of discord.py; fixed by update discord.py to version 2.6.0a5243+gec409a0a (alpha ver. of 2.6.0)
+    - Reason by [issue #10207](https://github.com/Rapptz/discord.py/issues/10207?utm_source=chatgpt.com) of discord.py; Fixed by update discord.py to version 2.6.0a5243+gec409a0a (alpha ver. of 2.6.0)
+    - 
 
 ## Commands
 ### General commands
