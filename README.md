@@ -12,6 +12,10 @@ This is a Discord bot that I made for my visually impaired friend, whitch can:
 ### Known issue:
  - I just noticed this bot is not working for multiple server, I'll try to refactor it later.
 
+### Log
+ - Bot repeatedly connect to vc and fail.
+    - reason by issue #10207 of discord.py; fixed by update discord.py to version 2.6.0a5243+gec409a0a (alpha ver. of 2.6.0)
+
 ## Commands
 ### General commands
 - `>helps`
