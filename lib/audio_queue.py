@@ -3,24 +3,24 @@ import discord
 import shutil
 import traceback
 class AudioQueueManager:
-    def __init__(self, voice_bot):
-        self.voice_bot = voice_bot
+    def __init__(self, state):
+        self.state = state # 以前是 self.voice_bot，現在改為單一伺服器的 state (struct)
         self.queue = asyncio.Queue()  # 全域播放佇列
         self.is_playing_queue = False
-    
-    # 將 voice_bot 的屬性和方法暴露給 AudioQueueManager
+
+    # 將 state 屬性和方法暴露給 AudioQueueManager
     @property               # 將方法包裝成屬性
     def voice_client(self): # 當呼叫 self.voice_client 時，實際上是呼叫 voice_bot.voice_client
-        return self.voice_bot.voice_client
+        return self.state.voice_client
     @property
     def task_channel(self):
-        return self.voice_bot.task_channel
+        return self.state.task_channel
     @voice_client.setter  # 包裝起來的屬性的 setter 方法
     def voice_client(self, value):
-        self.voice_bot.voice_client = value
+        self.state.voice_client = value
     @task_channel.setter    # 包裝起來的屬性的 setter 方法
     def task_channel(self, value):
-        self.voice_bot.task_channel = value
+        self.state.task_channel = value
 
     async def enqueue(self, channel: discord.VoiceChannel, audio_or_player):
         await self.queue.put((channel, audio_or_player))

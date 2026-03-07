@@ -4,9 +4,9 @@ from lib.myTTS import get_audio, combine_audios
 from httpx import LocalProtocolError
 
 class ChatListener:
-    def __init__(self, video_id, voice_bot, bot_voice_channel):
+    def __init__(self, video_id, state, bot_voice_channel): # 傳入參數改為 state
         self.video_id = video_id
-        self.voice_bot = voice_bot
+        self.state = state  # 替換為該伺服器的專屬 state
         self.bot_voice_channel = bot_voice_channel
         self.continue_flag = True
         self.chat = None # 尚未建立聊天室實例
@@ -40,13 +40,13 @@ class ChatListener:
                 self.continue_flag = False
                 break
         self.chat.terminate()
-        self.voice_bot.chat_reader = None
+        self.state.chat_reader = None # 結束時清空該伺服器的實例
         print("Chat reader has ended.")
 
     def stop(self):
         """停止聊天室讀取"""
         self.continue_flag = False
-        if self.chat.is_alive():
+        if self.chat and self.chat.is_alive():
             self.chat.terminate()
 
     async def process_chat_data(self, chat_data):
@@ -65,4 +65,4 @@ class ChatListener:
         ]
         # 語音加入佇列等待播放
         task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
-        await self.voice_bot.audio_queue.enqueue(self.bot_voice_channel, task_make_audio) # 加入全域佇列
+        await self.state.audio_queue.enqueue(self.bot_voice_channel, task_make_audio) # 加入專屬佇列
