@@ -23,13 +23,17 @@ def setup_events(bot: commands.Bot, voice_bot):
             return
         if not message.content.startswith(get_prefix(bot, message)):
             if voice_bot.read_mode:
-                audios = [
-                    await get_audio(message.author.display_name), # 發言者名稱
-                    await get_audio("在", language="zh-TW"),      # 「在」字
-                    await get_audio(message.channel.name),        # 頻道名稱
-                    await get_audio("說", language="zh-TW"),      # 「說」字
-                    await get_audio(message.content)              # 訊息內容
-                ]
+                try:
+                    audios = [
+                        await get_audio(message.author.display_name), # 發言者名稱
+                        await get_audio("在", language="zh-TW"),      # 「在」字
+                        await get_audio(message.channel.name),        # 頻道名稱
+                        await get_audio("說", language="zh-TW"),      # 「說」字
+                        await get_audio(message.content)              # 訊息內容
+                    ]
+                except AssertionError as e:
+                    print(f"[Read-out]: {e}")
+                    return
                 task_make_audio = asyncio.create_task(combine_audios(*audios)) # 合併音訊的並行任務
                 await voice_bot.audio_queue.enqueue(voice_bot.task_channel, task_make_audio) # 加入全域佇列
             # end if
