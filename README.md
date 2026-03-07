@@ -10,7 +10,7 @@ This is a Discord bot that I made for my visually impaired friend, whitch can:
 ※ It's now running on Raspberrypi 4B so the reactions would be a little bit slow, please leave it.
 
 ### Known issue:
- - I just noticed this bot is not working for multiple server, I'll try to refactor it later.
+ - [Fixed] I just noticed this bot is not working for multiple server, I'll try to refactor it later. // Fixed in 2026.03.08
 
 ### Log
  - **2025.08.09** Bot repeatedly connect to vc and fail.
