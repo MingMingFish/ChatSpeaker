@@ -62,6 +62,15 @@ class VoiceBot:
         state = self.get_state(ctx.guild.id)
         
         if state.voice_client:
+            # 停止 YouTube 聊天室讀取
+            if state.chat_reader is not None:
+                state.chat_reader.stop()
+                state.chat_reader = None
+            
+            # 清空佇列與停止播放進程
+            state.audio_queue.clear_queue()
+
+            #重置狀態並斷線
             state.task_channel = None
             state.read_mode = False
             await state.voice_client.disconnect()

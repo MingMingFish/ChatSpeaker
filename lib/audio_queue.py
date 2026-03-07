@@ -75,3 +75,17 @@ class AudioQueueManager:
             except Exception:
                 pass
         self.is_playing_queue = False
+
+    def clear_queue(self):
+        """優雅地清空佇列並停止當前音訊播放"""
+        # 1. 抽乾佇列：將所有還在排隊的音訊任務拿出來丟棄
+        while not self.queue.empty():
+            try:
+                self.queue.get_nowait()
+                self.queue.task_done()
+            except asyncio.QueueEmpty:
+                break
+        
+        # 2. 中斷播放：如果 FFmpeg 正在輸出音訊，強制終止它
+        if self.voice_client and self.voice_client.is_playing():
+            self.voice_client.stop()
