@@ -11,6 +11,7 @@ This is a Discord bot that I made for my visually impaired friend, whitch can:
 
 ### Known issue:
  - [Fixed] I just noticed this bot is not working for multiple server, I'll try to refactor it later. // Fixed in 2026.03.08
+ - Welcome message not working and not server customized, yet.
 
 ### Log
  - **2025.08.09** Bot repeatedly connect to vc and fail.
