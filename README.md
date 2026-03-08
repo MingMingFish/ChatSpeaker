@@ -17,6 +17,8 @@ This is a Discord bot that I made for my visually impaired friend, whitch can:
     - Reason by [issue #10207](https://github.com/Rapptz/discord.py/issues/10207?utm_source=chatgpt.com) of discord.py; Fixed by update discord.py to version 2.6.0a5243+gec409a0a (alpha ver. of 2.6.0)
  - **2026.03.08** Bot repeatedly connect to vc and fail.
     - Again, Discord updated the new DAVE (Data And Voice Encryption), just update the discord lib (above v2.7.1) [pip install -U "discord.py[voice]"]
+ - **2026.03.08** Fix issue: Bot would not work for multiple server in a same time.
+    - Now the bot can speak in different server in the same time without waiting the queue.
 
 ## Commands
 ### General commands
