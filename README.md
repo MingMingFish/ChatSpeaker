@@ -6,8 +6,8 @@ This is a Discord bot that I made for my visually impaired friend, whitch can:
  4. You can set your own command prefix for your Discord server
 
 [\[Invite my bot\]](https://discord.com/oauth2/authorize?client_id=1368220788875989032)\
-※ Still unstable version so it might not work sometimes.\
-※ It's now running on Raspberrypi 4B so the reactions would be a little bit slow, please leave it.
+※ It might be down sometimes, I'll fix it ASAP when I notice.\
+※ It's now running on Raspberrypi 4B so the reactions would be a little bit slow, please be patient.
 
 ### Known issue:
  - [Fixed] I just noticed this bot is not working for multiple server, I'll try to refactor it later. // Fixed in 2026.03.08
